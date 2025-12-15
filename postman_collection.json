@@ -1,0 +1,1053 @@
+{
+  "info": {
+    "name": "Exam Preparation API",
+    "description": "Complete API collection for Exam Preparation System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "examId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "subjectId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "chapterId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "quizId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "questionId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "description": "Existing authentication endpoints (reference only)",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login user and get JWT tokens. Set authToken variable from response."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Exams (User)",
+      "item": [
+        {
+          "name": "Get All Exams",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/exams",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "exams"]
+            },
+            "description": "Get all active exams"
+          }
+        },
+        {
+          "name": "Get Exam Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/exams/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "exams", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{examId}}"
+                }
+              ]
+            },
+            "description": "Get exam details with nested subjects"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subjects (User)",
+      "item": [
+        {
+          "name": "Get Subject Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/subjects/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "subjects", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{subjectId}}"
+                }
+              ]
+            },
+            "description": "Get subject details with nested chapters"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Chapters (User)",
+      "item": [
+        {
+          "name": "Get Chapter Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/chapters/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chapters", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{chapterId}}"
+                }
+              ]
+            },
+            "description": "Get chapter details with nested quizzes"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Quizzes (User)",
+      "item": [
+        {
+          "name": "Get Quiz (for taking)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/quizzes/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "quizzes", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{quizId}}"
+                }
+              ]
+            },
+            "description": "Get quiz with questions (without correct answers)"
+          }
+        },
+        {
+          "name": "Get Quiz Questions (with answers)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/quizzes/:id/questions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "quizzes", ":id", "questions"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{quizId}}"
+                }
+              ]
+            },
+            "description": "Get quiz questions with correct answers and explanations (for review)"
+          }
+        },
+        {
+          "name": "Submit Quiz Attempt",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"responses\": [\n    {\n      \"questionId\": \"question-uuid-1\",\n      \"selectedAnswer\": \"A\"\n    },\n    {\n      \"questionId\": \"question-uuid-2\",\n      \"selectedAnswer\": \"B\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/quizzes/:id/attempt",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "quizzes", ":id", "attempt"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{quizId}}"
+                }
+              ]
+            },
+            "description": "Submit quiz attempt with responses"
+          }
+        },
+        {
+          "name": "Get Quiz Attempts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/quizzes/:id/attempts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "quizzes", ":id", "attempts"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{quizId}}"
+                }
+              ]
+            },
+            "description": "Get user's quiz attempt history"
+          }
+        },
+        {
+          "name": "Get Attempt Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/quizzes/:id/attempts/:attemptId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "quizzes", ":id", "attempts", ":attemptId"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{quizId}}"
+                },
+                {
+                  "key": "attemptId",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Get detailed attempt results with all question responses"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Progress (User)",
+      "item": [
+        {
+          "name": "Get Progress Overview",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/progress/overview",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "progress", "overview"]
+            },
+            "description": "Get overall user progress across all exams"
+          }
+        },
+        {
+          "name": "Get Exam Progress",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/progress/exam/:examId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "progress", "exam", ":examId"],
+              "variable": [
+                {
+                  "key": "examId",
+                  "value": "{{examId}}"
+                }
+              ]
+            },
+            "description": "Get user's progress for an exam with subject breakdown"
+          }
+        },
+        {
+          "name": "Get Subject Progress",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/progress/subject/:subjectId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "progress", "subject", ":subjectId"],
+              "variable": [
+                {
+                  "key": "subjectId",
+                  "value": "{{subjectId}}"
+                }
+              ]
+            },
+            "description": "Get user's progress for a subject with chapter breakdown"
+          }
+        },
+        {
+          "name": "Get Chapter Progress",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/progress/chapter/:chapterId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "progress", "chapter", ":chapterId"],
+              "variable": [
+                {
+                  "key": "chapterId",
+                  "value": "{{chapterId}}"
+                }
+              ]
+            },
+            "description": "Get user's progress for a chapter with quiz breakdown"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Streak (User)",
+      "item": [
+        {
+          "name": "Get User Streak",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/streak",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "streak"]
+            },
+            "description": "Get user's daily streak information"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Exams",
+      "item": [
+        {
+          "name": "Create Exam",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"JEE Main\",\n  \"description\": \"Joint Entrance Examination Main\",\n  \"order\": 0\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/exams",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "exams"]
+            },
+            "description": "Create new exam (admin only)"
+          }
+        },
+        {
+          "name": "Update Exam",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Exam Name\",\n  \"description\": \"Updated description\",\n  \"isActive\": true,\n  \"order\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/exams/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "exams", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{examId}}"
+                }
+              ]
+            },
+            "description": "Update exam (admin only)"
+          }
+        },
+        {
+          "name": "Delete Exam",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/exams/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "exams", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{examId}}"
+                }
+              ]
+            },
+            "description": "Delete exam (cascades to all child entities) (admin only)"
+          }
+        },
+        {
+          "name": "Reorder Exam",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/exams/:id/reorder",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "exams", ":id", "reorder"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{examId}}"
+                }
+              ]
+            },
+            "description": "Reorder exam (admin only)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Subjects",
+      "item": [
+        {
+          "name": "Create Subject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mathematics\",\n  \"description\": \"Math subject\",\n  \"order\": 0\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/exams/:examId/subjects",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "exams", ":examId", "subjects"],
+              "variable": [
+                {
+                  "key": "examId",
+                  "value": "{{examId}}"
+                }
+              ]
+            },
+            "description": "Create subject under exam (admin only)"
+          }
+        },
+        {
+          "name": "Update Subject",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Subject\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/subjects/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "subjects", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{subjectId}}"
+                }
+              ]
+            },
+            "description": "Update subject (admin only)"
+          }
+        },
+        {
+          "name": "Delete Subject",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/subjects/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "subjects", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{subjectId}}"
+                }
+              ]
+            },
+            "description": "Delete subject (admin only)"
+          }
+        },
+        {
+          "name": "Reorder Subject",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/subjects/:id/reorder",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "subjects", ":id", "reorder"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{subjectId}}"
+                }
+              ]
+            },
+            "description": "Reorder subject (admin only)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Chapters",
+      "item": [
+        {
+          "name": "Create Chapter",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Algebra\",\n  \"description\": \"Algebra chapter\",\n  \"order\": 0\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/subjects/:subjectId/chapters",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "subjects", ":subjectId", "chapters"],
+              "variable": [
+                {
+                  "key": "subjectId",
+                  "value": "{{subjectId}}"
+                }
+              ]
+            },
+            "description": "Create chapter under subject (admin only)"
+          }
+        },
+        {
+          "name": "Update Chapter",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Chapter\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/chapters/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "chapters", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{chapterId}}"
+                }
+              ]
+            },
+            "description": "Update chapter (admin only)"
+          }
+        },
+        {
+          "name": "Delete Chapter",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/chapters/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "chapters", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{chapterId}}"
+                }
+              ]
+            },
+            "description": "Delete chapter (admin only)"
+          }
+        },
+        {
+          "name": "Reorder Chapter",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/chapters/:id/reorder",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "chapters", ":id", "reorder"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{chapterId}}"
+                }
+              ]
+            },
+            "description": "Reorder chapter (admin only)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Quizzes",
+      "item": [
+        {
+          "name": "Create Quiz",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Basic Algebra Quiz\",\n  \"description\": \"Test your algebra knowledge\",\n  \"order\": 0\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/chapters/:chapterId/quizzes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "chapters", ":chapterId", "quizzes"],
+              "variable": [
+                {
+                  "key": "chapterId",
+                  "value": "{{chapterId}}"
+                }
+              ]
+            },
+            "description": "Create quiz under chapter (admin only)"
+          }
+        },
+        {
+          "name": "Update Quiz",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Quiz Title\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/quizzes/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "quizzes", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{quizId}}"
+                }
+              ]
+            },
+            "description": "Update quiz (admin only)"
+          }
+        },
+        {
+          "name": "Delete Quiz",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/quizzes/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "quizzes", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{quizId}}"
+                }
+              ]
+            },
+            "description": "Delete quiz (admin only)"
+          }
+        },
+        {
+          "name": "Reorder Quiz",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/quizzes/:id/reorder",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "quizzes", ":id", "reorder"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{quizId}}"
+                }
+              ]
+            },
+            "description": "Reorder quiz (admin only)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Questions",
+      "item": [
+        {
+          "name": "Create Question",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"What is 2 + 2?\",\n  \"optionA\": \"3\",\n  \"optionB\": \"4\",\n  \"optionC\": \"5\",\n  \"optionD\": \"6\",\n  \"correctAnswer\": \"B\",\n  \"explanation\": \"Basic addition: 2 + 2 = 4\",\n  \"order\": 0\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/quizzes/:quizId/questions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "quizzes", ":quizId", "questions"],
+              "variable": [
+                {
+                  "key": "quizId",
+                  "value": "{{quizId}}"
+                }
+              ]
+            },
+            "description": "Create question under quiz (admin only)"
+          }
+        },
+        {
+          "name": "Update Question",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Updated question text\",\n  \"correctAnswer\": \"A\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/questions/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "questions", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{questionId}}"
+                }
+              ]
+            },
+            "description": "Update question (admin only)"
+          }
+        },
+        {
+          "name": "Delete Question",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/questions/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "questions", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{questionId}}"
+                }
+              ]
+            },
+            "description": "Delete question (admin only)"
+          }
+        },
+        {
+          "name": "Reorder Question",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/questions/:id/reorder",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "questions", ":id", "reorder"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{questionId}}"
+                }
+              ]
+            },
+            "description": "Reorder question (admin only)"
+          }
+        }
+      ]
+    }
+  ]
+}
