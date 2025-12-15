@@ -1,41 +1,76 @@
-import { createClient } from "@/lib/supabase/server";
+import { requireServerAdmin } from "@/lib/auth/server-helpers";
 import { prisma } from "@/lib/prisma/client";
-import { UserRole } from "@/generated/prisma/enums";
-import { redirect } from "next/navigation";
-import Link from "next/link";
 
 async function getDashboardData() {
-  const supabase = await createClient();
-  const {
-    data: { user: supabaseUser },
-  } = await supabase.auth.getUser();
+  try {
+    const [
+      totalUsers,
+      adminUsers,
+      regularUsers,
+      recentUsers,
+      usersThisMonth,
+      usersLastMonth,
+    ] = await Promise.all([
+      // Total users
+      prisma.user.count(),
+      // Admin users
+      prisma.user.count({ where: { role: "ADMIN" } }),
+      // Regular users
+      prisma.user.count({ where: { role: "USER" } }),
+      // Recent users (last 10)
+      prisma.user.findMany({
+        take: 10,
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          createdAt: true,
+        },
+      }),
+      // Users created this month
+      prisma.user.count({
+        where: {
+          createdAt: {
+            gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+          },
+        },
+      }),
+      // Users created last month
+      prisma.user.count({
+        where: {
+          createdAt: {
+            gte: new Date(
+              new Date().getFullYear(),
+              new Date().getMonth() - 1,
+              1
+            ),
+            lt: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+          },
+        },
+      }),
+    ]);
 
-  if (!supabaseUser) {
-    redirect("/login");
-  }
+    const growthRate =
+      usersLastMonth > 0
+        ? ((usersThisMonth - usersLastMonth) / usersLastMonth) * 100
+        : usersThisMonth > 0
+        ? 100
+        : 0;
 
-  const user = await prisma.user.findUnique({
-    where: { id: supabaseUser.id },
-  });
-
-  if (!user || user.role !== UserRole.ADMIN) {
-    redirect("/");
-  }
-
-  // Fetch dashboard data
-  const response = await fetch(
-    `${
-      process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-    }/api/admin/dashboard`,
-    {
-      headers: {
-        Authorization: `Bearer ${supabaseUser.id}`, // This will be replaced with actual JWT in real implementation
+    return {
+      stats: {
+        totalUsers,
+        adminUsers,
+        regularUsers,
+        usersThisMonth,
+        usersLastMonth,
+        growthRate: Math.round(growthRate * 100) / 100,
       },
-      cache: "no-store",
-    }
-  );
-
-  if (!response.ok) {
+      recentUsers,
+    };
+  } catch (error) {
     return {
       stats: {
         totalUsers: 0,
@@ -48,11 +83,13 @@ async function getDashboardData() {
       recentUsers: [],
     };
   }
-
-  return response.json();
 }
 
 export default async function AdminDashboard() {
+  // Authenticate and check admin role (this will redirect if not admin)
+  await requireServerAdmin();
+
+  // Fetch data directly from database (no API call needed)
   const data = await getDashboardData();
 
   return (

@@ -1,26 +1,21 @@
-import { createClient } from "@/lib/supabase/server";
-import { prisma } from "@/lib/prisma/client";
-import { redirect } from "next/navigation";
+import { requireServerAdmin } from "@/lib/auth/server-helpers";
+import { buildApiUrl } from "@/lib/utils/api";
+import { authenticatedFetch } from "@/lib/utils/fetch";
 import Link from "next/link";
-import { UserRole } from "@/generated/prisma/enums";
+
+const DEFAULT_PAGINATION = {
+  users: [],
+  pagination: {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+  },
+};
 
 async function getUsers(page: number = 1, limit: number = 10, search?: string) {
-  const supabase = await createClient();
-  const {
-    data: { user: supabaseUser },
-  } = await supabase.auth.getUser();
-
-  if (!supabaseUser) {
-    redirect("/login");
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { id: supabaseUser.id },
-  });
-
-  if (!user || user.role !== UserRole.ADMIN) {
-    redirect("/");
-  }
+  // Authenticate and check admin role (this will redirect if not admin)
+  await requireServerAdmin();
 
   const params = new URLSearchParams({
     page: page.toString(),
@@ -28,28 +23,15 @@ async function getUsers(page: number = 1, limit: number = 10, search?: string) {
     ...(search && { search }),
   });
 
-  const response = await fetch(
-    `${
-      process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-    }/api/users?${params}`,
+  const response = await authenticatedFetch(
+    buildApiUrl(`/api/users?${params}`),
     {
-      headers: {
-        Authorization: `Bearer ${supabaseUser.id}`, // This will be replaced with actual JWT in real implementation
-      },
       cache: "no-store",
     }
   );
 
   if (!response.ok) {
-    return {
-      users: [],
-      pagination: {
-        page: 1,
-        limit: 10,
-        total: 0,
-        totalPages: 0,
-      },
-    };
+    return DEFAULT_PAGINATION;
   }
 
   return response.json();

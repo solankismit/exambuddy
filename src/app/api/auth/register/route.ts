@@ -4,6 +4,8 @@ import { generateTokens } from "@/lib/auth/jwt";
 import { prisma } from "@/lib/prisma/client";
 import { registerSchema } from "@/lib/utils/validation";
 import { handleError, AppError } from "@/lib/utils/errors";
+import { mapPrismaUserToAuthUser } from "@/lib/auth/user-mapper";
+import { REFRESH_TOKEN_EXPIRATION } from "@/lib/auth/constants";
 
 /**
  * POST /api/auth/register
@@ -58,30 +60,22 @@ export async function POST(request: NextRequest) {
     });
 
     // Generate custom JWT tokens
-    const { accessToken, refreshToken } = generateTokens({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      role: user.role,
-    });
+    const { accessToken, refreshToken } = generateTokens(
+      mapPrismaUserToAuthUser(user)
+    );
 
     // Store refresh token in database
     await prisma.session.create({
       data: {
         userId: user.id,
         token: refreshToken,
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+        expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRATION),
       },
     });
 
     return NextResponse.json(
       {
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        },
+        user: mapPrismaUserToAuthUser(user),
         accessToken,
         refreshToken,
       },

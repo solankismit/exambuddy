@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyRefreshToken, generateTokens } from "@/lib/auth/jwt";
 import { prisma } from "@/lib/prisma/client";
 import { handleError, AppError } from "@/lib/utils/errors";
+import { mapPrismaUserToAuthUser } from "@/lib/auth/user-mapper";
+import { REFRESH_TOKEN_EXPIRATION } from "@/lib/auth/constants";
 
 /**
  * POST /api/auth/refresh
@@ -42,19 +44,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate new token pair
-    const { accessToken, refreshToken: newRefreshToken } = generateTokens({
-      id: session.user.id,
-      email: session.user.email,
-      name: session.user.name,
-      role: session.user.role,
-    });
+    const { accessToken, refreshToken: newRefreshToken } = generateTokens(
+      mapPrismaUserToAuthUser(session.user)
+    );
+
+    const expiresAt = new Date(Date.now() + REFRESH_TOKEN_EXPIRATION);
 
     // Update session with new refresh token
     await prisma.session.update({
       where: { id: session.id },
       data: {
         token: newRefreshToken,
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+        expiresAt,
       },
     });
 
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
       data: {
         userId: session.user.id,
         token: newRefreshToken,
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        expiresAt,
       },
     });
 

@@ -1,30 +1,12 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { prisma } from "@/lib/prisma/client";
+import { requireServerAdmin } from "@/lib/auth/server-helpers";
 import Link from "next/link";
-import { UserRole } from "@/generated/prisma/enums";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user: supabaseUser },
-  } = await supabase.auth.getUser();
-
-  if (!supabaseUser) {
-    redirect("/login");
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { id: supabaseUser.id },
-  });
-
-  if (!user || user.role !== UserRole.ADMIN) {
-    redirect("/");
-  }
+  const user = await requireServerAdmin();
 
   return (
     <div className="min-h-screen bg-gray-50">

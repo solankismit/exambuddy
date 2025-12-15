@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authenticateRequest } from "@/lib/auth/middleware";
+import { authenticateRequest } from "@/lib/auth/server-auth";
 import { requireAdmin } from "@/lib/auth/rbac";
 import { prisma } from "@/lib/prisma/client";
 import { updateRoleSchema } from "@/lib/utils/validation";

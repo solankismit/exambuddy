@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authenticateRequest } from "@/lib/auth/middleware";
+import { authenticateRequest } from "@/lib/auth/server-auth";
 import { requireAdmin } from "@/lib/auth/rbac";
 import { prisma } from "@/lib/prisma/client";
-import { paginationSchema, updateUserSchema } from "@/lib/utils/validation";
+import { paginationSchema } from "@/lib/utils/validation";
 import { handleError } from "@/lib/utils/errors";
 
 /**

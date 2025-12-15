@@ -1,38 +1,15 @@
-import { createClient } from "@/lib/supabase/server";
-import { prisma } from "@/lib/prisma/client";
-import { UserRole } from "@/generated/prisma/enums";
+import { requireServerAdmin } from "@/lib/auth/server-helpers";
+import { buildApiUrl } from "@/lib/utils/api";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
 async function getUser(id: string) {
-  const supabase = await createClient();
-  const {
-    data: { user: supabaseUser },
-  } = await supabase.auth.getUser();
+  // Authenticate and check admin role (this will redirect if not admin)
+  await requireServerAdmin();
 
-  if (!supabaseUser) {
-    redirect("/login");
-  }
-
-  const currentUser = await prisma.user.findUnique({
-    where: { id: supabaseUser.id },
+  const response = await fetch(buildApiUrl(`/api/users/${id}`), {
+    cache: "no-store",
   });
-
-  if (!currentUser || currentUser.role !== UserRole.ADMIN) {
-    redirect("/");
-  }
-
-  const response = await fetch(
-    `${
-      process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-    }/api/users/${id}`,
-    {
-      headers: {
-        Authorization: `Bearer ${supabaseUser.id}`, // This will be replaced with actual JWT in real implementation
-      },
-      cache: "no-store",
-    }
-  );
 
   if (!response.ok) {
     redirect("/admin/users");

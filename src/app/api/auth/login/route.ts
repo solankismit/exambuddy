@@ -4,6 +4,8 @@ import { generateTokens } from "@/lib/auth/jwt";
 import { prisma } from "@/lib/prisma/client";
 import { loginSchema } from "@/lib/utils/validation";
 import { handleError, AppError } from "@/lib/utils/errors";
+import { mapPrismaUserToAuthUser } from "@/lib/auth/user-mapper";
+import { REFRESH_TOKEN_EXPIRATION } from "@/lib/auth/constants";
 
 /**
  * POST /api/auth/login
@@ -62,18 +64,13 @@ export async function POST(request: NextRequest) {
       data: {
         userId: user.id,
         token: refreshToken,
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+        expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRATION),
       },
     });
 
     return NextResponse.json(
       {
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        },
+        user: mapPrismaUserToAuthUser(user),
         accessToken,
         refreshToken,
       },

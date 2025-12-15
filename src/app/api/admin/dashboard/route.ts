@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authenticateRequest } from "@/lib/auth/middleware";
-import { requireAdmin } from "@/lib/auth/rbac";
 import { prisma } from "@/lib/prisma/client";
 import { handleError } from "@/lib/utils/errors";
+import { authenticateRequest } from "@/lib/auth/server-auth";
+import { requireAdmin } from "@/lib/auth/rbac";
 
 /**
  * GET /api/admin/dashboard
