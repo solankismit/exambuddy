@@ -1,6 +1,4 @@
 import { requireServerAdmin } from "@/lib/auth/server-helpers";
-import { buildApiUrl } from "@/lib/utils/api";
-import { authenticatedFetch } from "@/lib/utils/fetch";
 import Link from "next/link";
 
 const DEFAULT_PAGINATION = {
@@ -17,24 +15,47 @@ async function getUsers(page: number = 1, limit: number = 10, search?: string) {
   // Authenticate and check admin role (this will redirect if not admin)
   await requireServerAdmin();
 
-  const params = new URLSearchParams({
-    page: page.toString(),
-    limit: limit.toString(),
-    ...(search && { search }),
-  });
+  // Fetch directly from database since we're already authenticated server-side
+  const { prisma } = await import("@/lib/prisma/client");
+  const { paginationSchema } = await import("@/lib/utils/validation");
 
-  const response = await authenticatedFetch(
-    buildApiUrl(`/api/users?${params}`),
-    {
-      cache: "no-store",
-    }
-  );
+  const skip = (page - 1) * limit;
+  const where = search
+    ? {
+        OR: [
+          { email: { contains: search, mode: "insensitive" as const } },
+          { name: { contains: search, mode: "insensitive" as const } },
+        ],
+      }
+    : {};
 
-  if (!response.ok) {
-    return DEFAULT_PAGINATION;
-  }
+  const [users, total] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    }),
+    prisma.user.count({ where }),
+  ]);
 
-  return response.json();
+  return {
+    users,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 }
 
 export default async function UsersPage({

@@ -30,12 +30,14 @@ export default function LoginForm() {
         throw new Error(data.error?.message || "Login failed");
       }
 
-      // Store tokens
-      if (data.accessToken) {
-        localStorage.setItem("accessToken", data.accessToken);
-      }
-      if (data.refreshToken) {
-        localStorage.setItem("refreshToken", data.refreshToken);
+      // Store tokens and user data
+      if (data.accessToken && data.refreshToken && data.user) {
+        const { setAuthStorage } = await import("@/lib/auth/storage");
+        setAuthStorage({
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+          user: data.user,
+        });
       }
 
       // Redirect based on role

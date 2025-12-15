@@ -89,6 +89,7 @@ export const createQuestionSchema = z.object({
     errorMap: () => ({ message: "Correct answer must be A, B, C, or D" }),
   }),
   explanation: z.string().optional(),
+  complexity: z.enum(["EASY", "MEDIUM", "HARD"]).default("MEDIUM"),
   order: z.number().int().default(0),
 });
 
@@ -100,6 +101,7 @@ export const updateQuestionSchema = z.object({
   optionD: z.string().min(1).optional(),
   correctAnswer: z.enum(["A", "B", "C", "D"]).optional(),
   explanation: z.string().optional(),
+  complexity: z.enum(["EASY", "MEDIUM", "HARD"]).optional(),
   isActive: z.boolean().optional(),
   order: z.number().int().optional(),
 });
