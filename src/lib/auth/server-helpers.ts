@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { prisma } from "@/lib/prisma/client";
 import { AuthUser } from "@/lib/types/auth";
-import { UserRole } from "@/generated/prisma/enums";
+import { UserRole } from "@/generated/prisma";
 import { redirect } from "next/navigation";
 import { mapPrismaUserToAuthUser } from "./user-mapper";
 

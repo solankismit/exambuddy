@@ -1,4 +1,4 @@
-import { UserRole } from "@/generated/prisma/enums";
+import { UserRole } from "@/generated/prisma";
 import { AuthContext } from "@/lib/types/auth";
 import { AppError } from "@/lib/utils/errors";
 
