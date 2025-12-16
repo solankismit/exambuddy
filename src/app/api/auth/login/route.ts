@@ -14,11 +14,20 @@ import { REFRESH_TOKEN_EXPIRATION } from "@/lib/auth/constants";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password } = loginSchema.parse(body);
+    const parsed = loginSchema.parse(body);
+
+    // Normalize email: trim whitespace and convert to lowercase
+    const email = parsed.email.trim().toLowerCase();
+    const password = parsed.password;
+
+    // Validate normalized email again
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      throw new AppError(400, "Invalid email address", "VALIDATION_ERROR");
+    }
 
     const supabase = await createClient();
 
-    // Authenticate with Supabase
+    // Authenticate with Supabase using normalized email
     const {
       data: { user: supabaseUser, session },
       error: authError,
