@@ -16,6 +16,11 @@
       "type": "string"
     },
     {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "examId",
       "value": "",
       "type": "string"
@@ -39,13 +44,40 @@
       "key": "questionId",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "attemptId",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
     {
       "name": "Authentication",
-      "description": "Existing authentication endpoints (reference only)",
+      "description": "User authentication endpoints",
       "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"John Doe\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a new user account"
+          }
+        },
         {
           "name": "Login",
           "request": {
@@ -66,6 +98,244 @@
               "path": ["api", "auth", "login"]
             },
             "description": "Login user and get JWT tokens. Set authToken variable from response."
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "logout"]
+            },
+            "description": "Logout user and invalidate tokens"
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"your-refresh-token\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "refresh"]
+            },
+            "description": "Refresh access token using refresh token"
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            },
+            "description": "Get current authenticated user information"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users (Admin)",
+      "description": "User management endpoints (admin only)",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users?page=1&limit=10&search=",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Items per page"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by email or name",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List all users with pagination (admin only)"
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"name\": \"New User\",\n  \"role\": \"USER\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            },
+            "description": "Create a new user (admin only)"
+          }
+        },
+        {
+          "name": "Get User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{userId}}"
+                }
+              ]
+            },
+            "description": "Get user by ID (admin or self)"
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"email\": \"updated@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{userId}}"
+                }
+              ]
+            },
+            "description": "Update user (admin or self)"
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{userId}}"
+                }
+              ]
+            },
+            "description": "Delete user (admin only, cannot delete self)"
+          }
+        },
+        {
+          "name": "Update User Role",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"ADMIN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/:id/roles",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", ":id", "roles"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{userId}}"
+                }
+              ]
+            },
+            "description": "Update user role (admin only, cannot change own role)"
           }
         }
       ]
@@ -303,7 +573,7 @@
                 },
                 {
                   "key": "attemptId",
-                  "value": ""
+                  "value": "{{attemptId}}"
                 }
               ]
             },
@@ -426,6 +696,29 @@
               "path": ["api", "streak"]
             },
             "description": "Get user's daily streak information"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "dashboard"]
+            },
+            "description": "Get dashboard statistics including user counts, growth rate, and recent users (admin only)"
           }
         }
       ]
@@ -943,7 +1236,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"text\": \"What is 2 + 2?\",\n  \"optionA\": \"3\",\n  \"optionB\": \"4\",\n  \"optionC\": \"5\",\n  \"optionD\": \"6\",\n  \"correctAnswer\": \"B\",\n  \"explanation\": \"Basic addition: 2 + 2 = 4\",\n  \"order\": 0\n}"
+              "raw": "{\n  \"text\": \"What is 2 + 2?\",\n  \"optionA\": \"3\",\n  \"optionB\": \"4\",\n  \"optionC\": \"5\",\n  \"optionD\": \"6\",\n  \"correctAnswer\": \"B\",\n  \"explanation\": \"Basic addition: 2 + 2 = 4\",\n  \"complexity\": \"EASY\",\n  \"order\": 0\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/admin/quizzes/:quizId/questions",
