@@ -85,9 +85,7 @@ export const createQuestionSchema = z.object({
   optionB: z.string().min(1, "Option B is required"),
   optionC: z.string().min(1, "Option C is required"),
   optionD: z.string().min(1, "Option D is required"),
-  correctAnswer: z.enum(["A", "B", "C", "D"], {
-    errorMap: () => ({ message: "Correct answer must be A, B, C, or D" }),
-  }),
+  correctAnswer: z.enum(["A", "B", "C", "D"]),
   explanation: z.string().optional(),
   complexity: z.enum(["EASY", "MEDIUM", "HARD"]).default("MEDIUM"),
   order: z.number().int().default(0),
