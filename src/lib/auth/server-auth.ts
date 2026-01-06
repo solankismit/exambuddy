@@ -55,37 +55,37 @@ export async function authenticateRequest(
     throw new AppError(404, "User not found", "USER_NOT_FOUND");
   }
 
-  // Verify user still exists in Supabase (optional check, can be removed for better performance)
-  // Only verify if you need to ensure Supabase session is still valid
-  try {
-    const supabase = await getSupabaseClient(request);
-    const {
-      data: { user: supabaseUser },
-      error: supabaseError,
-    } = await supabase.auth.getUser();
+  // // Verify user still exists in Supabase (optional check, can be removed for better performance)
+  // // Only verify if you need to ensure Supabase session is still valid
+  // try {
+  //   const supabase = await getSupabaseClient(request);
+  //   const {
+  //     data: { user: supabaseUser },
+  //     error: supabaseError,
+  //   } = await supabase.auth.getUser();
 
-    // If Supabase user doesn't exist or doesn't match, invalidate
-    if (supabaseError || !supabaseUser || supabaseUser.id !== user.id) {
-      console.log(
-        "Supabase session invalid",
-        supabaseError,
-        supabaseUser,
-        user
-      );
-      throw new AppError(
-        401,
-        "Supabase session invalid",
-        "SUPABASE_SESSION_INVALID"
-      );
-    }
-  } catch (error) {
-    // If it's already an AppError, rethrow
-    if (error instanceof AppError) {
-      throw error;
-    }
-    // Otherwise, treat as unauthorized
-    throw new AppError(401, "Authentication failed", "AUTH_FAILED");
-  }
+  //   // If Supabase user doesn't exist or doesn't match, invalidate
+  //   if (supabaseError || !supabaseUser || supabaseUser.id !== user.id) {
+  //     console.log(
+  //       "Supabase session invalid",
+  //       supabaseError,
+  //       supabaseUser,
+  //       user
+  //     );
+  //     throw new AppError(
+  //       401,
+  //       "Supabase session invalid",
+  //       "SUPABASE_SESSION_INVALID"
+  //     );
+  //   }
+  // } catch (error) {
+  //   // If it's already an AppError, rethrow
+  //   if (error instanceof AppError) {
+  //     throw error;
+  //   }
+  //   // Otherwise, treat as unauthorized
+  //   throw new AppError(401, "Authentication failed", "AUTH_FAILED");
+  // }
 
   return {
     user: mapPrismaUserToAuthUser(user),
