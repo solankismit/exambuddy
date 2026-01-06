@@ -66,6 +66,12 @@ export async function authenticateRequest(
 
     // If Supabase user doesn't exist or doesn't match, invalidate
     if (supabaseError || !supabaseUser || supabaseUser.id !== user.id) {
+      console.log(
+        "Supabase session invalid",
+        supabaseError,
+        supabaseUser,
+        user
+      );
       throw new AppError(
         401,
         "Supabase session invalid",
